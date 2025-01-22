@@ -56,7 +56,13 @@ class GifController extends ChangeNotifier {
     if (_isDisposed || _frames.isEmpty) {
       return;
     }
-    await Future.delayed(_frames[_currentIndex].duration);
+    // Resolves https://github.com/flutter/flutter/issues/29130. Set default
+    // duration for frames that are too short to 100ms
+    Duration duration = _frames[_currentIndex].duration;
+    if (duration < const Duration(milliseconds: 20)) {
+      duration = const Duration(milliseconds: 100);
+    }
+    await Future.delayed(duration);
 
     if (_isDisposed) {
       return;
